@@ -25,14 +25,13 @@ public class MerchantService implements IMerchantService {
     @Override
     @Transactional
     public Response createMerchant(CreateMerchantRequest request) {
-
         var code = request.validate(_repository);
         if (code != ErrorCode.SUCCESS) {
             return Response.ERROR(code);
         }
         var merchant = request.ToMerchant();
-        _repository.save(merchant);
-        return Response.SUCCESS(merchant);
+        var id =  _repository.save(merchant).getId();
+        return Response.SUCCESS(id);
     }
 
     @Override
