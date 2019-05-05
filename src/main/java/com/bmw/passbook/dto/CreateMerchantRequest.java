@@ -43,7 +43,7 @@ public class CreateMerchantRequest {
         var merchant = new Merchant();
         merchant.setName(this.name);
         Example<Merchant> example = Example.of(merchant);
-        if (!repository.exists(example)) {
+        if (repository.exists(example)) {
             return ErrorCode.DUPLICATE_NAME;
         }
         if (StringUtils.isEmpty(this.logoUrl)) {

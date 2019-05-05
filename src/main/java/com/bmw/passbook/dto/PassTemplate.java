@@ -18,8 +18,8 @@ public class PassTemplate {
     private Date start;
     private Date end;
 
-    public ErrorCode validate(MerchantRepository repository){
-        if(null==repository.findById(id)){
+    public ErrorCode validate(MerchantRepository repository) {
+        if (null == repository.findById(id)) {
             return ErrorCode.MERCHANTS_NOT_EXIST;
         }
         return ErrorCode.SUCCESS;

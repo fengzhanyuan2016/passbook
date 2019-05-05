@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Table(name = "merchants")
 public class Merchant {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",nullable = false)
     private Integer id;
 

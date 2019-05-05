@@ -1,5 +1,7 @@
 package com.bmw.passbook.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.bmw.passbook.constant.Constants;
 import com.bmw.passbook.constant.ErrorCode;
 import com.bmw.passbook.dto.CreateMerchantRequest;
 import com.bmw.passbook.dto.CreateMerchantResponse;
@@ -9,6 +11,7 @@ import com.bmw.passbook.repository.MerchantRepository;
 import com.bmw.passbook.service.IMerchantService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.var;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MerchantService implements IMerchantService {
     private final MerchantRepository _repository;
+    private final KafkaTemplate<String, String> _kafkaTemplate;
 
-    public MerchantService(MerchantRepository repository) {
+    public MerchantService(MerchantRepository repository, KafkaTemplate<String, String> kafkaTemplate) {
         this._repository = repository;
+        this._kafkaTemplate = kafkaTemplate;
     }
 
     @Override
@@ -37,11 +42,23 @@ public class MerchantService implements IMerchantService {
 
     @Override
     public Response buildMerchantById(Integer id) {
-        return null;
+        var merchant = _repository.findById(id);
+        if (null == merchant) {
+            return Response.ERROR(ErrorCode.MERCHANTS_NOT_EXIST);
+        }
+        var response = Response.SUCCESS(merchant);
+        return response;
     }
 
     @Override
     public Response dropPassTemplate(PassTemplate template) {
-        return null;
+        var error = template.validate(_repository);
+        if (error != ErrorCode.SUCCESS) {
+            return Response.ERROR(error);
+        }
+        String passTemplate = JSON.toJSONString(template);
+        _kafkaTemplate.send(Constants.TEMPLATE_TOPIC, Constants.TEMPLATE_TOPIC, passTemplate);
+        log.info("dropPassTemplate:{}", passTemplate);
+        return Response.SUCCESS("success");
     }
 }
