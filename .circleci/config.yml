@@ -1,0 +1,22 @@
+version: 2 # use CircleCI 2.0
+jobs: 
+  build: # 构建的工作    
+    working_directory: ~/passbook # directory where steps will run
+    docker: # 使用docker
+      - image: circleci/openjdk:8-jdk-browsers
+    steps: # 命令行的集合
+      - checkout # 将文件拷贝到 working_directory 文件夹
+      - restore_cache: # 当pom.xml没有变化是缓存 pom中的包文件
+          key: circleci-passbook-{{ checksum "pom.xml" }}
+      - run: mvn dependency:go-offline # 获取项目依赖库
+      - save_cache: # 保存项目依赖
+          paths:
+            - ~/.m2
+          key: circleci-passbook-{{ checksum "pom.xml" }}
+      - run: mvn package # 执行打包测试
+      - store_test_results: # uploads the test metadata from the `target/surefire-reports` directory so that it can show up in the CircleCI dashboard. 
+      # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: target/surefire-reports
+      - store_artifacts: # store the uberjar as an artifact
+      # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+          path: target/passbook-0.0.1.jar
