@@ -37,6 +37,13 @@ Rowkey:用户总数+5随机数
 docker run -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=192.168.2.15 -e ADVERTISED_PORT=9092 spotify/kafka
 
 
+[ ! -f "./zookeeper-3.4.5-cdh5.7.0.tar.gz" ] && wget http://archive.cloudera.com/cdh5/cdh/5/zookeeper-3.4.5-cdh5.7.0.tar.gz
+tar -zvxf zookeeper-3.4.5-cdh5.7.0.tar.gz &&  mv zookeeper-3.4.5-cdh5.7.0 /usr/local/zk
+
+
+
+
+
 
 CREATE TABLE `merchants` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
